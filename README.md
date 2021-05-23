@@ -1,0 +1,2 @@
+# QPCommonShellScripts
+为方便编写规范的shell脚本而搭建的一套可复用的shell脚本架框，使用时只需引用qpcss.sh文件即可。
