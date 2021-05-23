@@ -11,7 +11,7 @@
 脚本的位置可以自由放置，不过建议放在所有脚本都方便引用的地方。
 
 ```shell
-sudo curl -L https://github.com/keqiongpan/QPCommonShellScripts/raw/main/src/qpcss.sh -o /usr/local/bin/qpcss.sh
+sudo curl -L https://github.com/keqiongpan/QPCommonShellScripts/raw/master/src/qpcss.sh -o /usr/local/bin/qpcss.sh
 sudo chmod a+x /usr/local/bin/qpcss.sh
 ```
 
