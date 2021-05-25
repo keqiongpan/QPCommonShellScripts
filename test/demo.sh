@@ -1,4 +1,4 @@
-#!/bin/sh /usr/local/bin/qpcss.sh
+#!/bin/env qpcss.sh
 
 # 设置命令行选项，如“-u <用户名> -p <工作路径> -f”可以设置为 u:p:f ，详细说明可查阅 getopts 命令。
 GETOPTS=":u:p:f"
@@ -12,7 +12,7 @@ WORKPATH=$(pwd)
 # 是否强制执行
 ISFORCE=0
 # 操作文件
-TARGETFILE=
+TARGETFILE=''
 
 usage() {
 cat 1>&2 <<@@usage@@

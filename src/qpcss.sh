@@ -3,7 +3,7 @@
 
 ################################################################################
 # qpcss.sh                                                                     #
-# QPCommonShellScripts                                                         #
+# QPCommonShellScripts - 0.1.0                                                 #
 #                                                                              #
 # Created by keqiongpan@163.com on 2021/05/23.                                 #
 # Copyright (c) 2021 Qiongpan Ke. All rights reserved.                         #
@@ -42,7 +42,10 @@
 # The path of scripts.
 QPCSS_SCRIPT="$0"
 RUNNING_SCRIPT="$1"
-shift
+
+if [ $# -gt 0 ]; then
+    shift
+fi
 
 # The position constants of the script.
 WORKDIR=$(pwd)
@@ -51,8 +54,9 @@ BASENAME=$(basename "$RUNNING_SCRIPT")
 
 # The settings variables of the script.
 DATEFMT='+%Y-%m-%d %H:%M:%S.%3N'
-GETOPTS=
+GETOPTS=''
 VERBOSE=0
+VERBOSE_PREFIX=''
 USAGE=0
 
 

@@ -1,6 +1,6 @@
 # QPCommonShellScripts
 
-为方便编写规范的shell脚本而搭建的一套可复用的shell脚本架框，使用时只需引用qpcss.sh文件即可。
+为方便编写规范的shell脚本而搭建的一套可复用的 shell 脚本架框，使用时只需引用 qpcss.sh 文件即可。
 
 ## 使用说明
 
@@ -20,10 +20,8 @@ sudo chmod a+x /usr/local/bin/qpcss.sh
 在您的 shell 脚本中引用 qpcss.sh ，只需要修改第一行的脚本解析器设置即可：
 
 ```shell
-#!/bin/sh /usr/local/bin/qpcss.sh
+#!/bin/env qpcss.sh
 ```
-
-**注意：此处 /bin/sh 根据您的脚本类型可设置为其它，如 /bin/bash 、 /bin/ksh 等，而 qpcss.sh 注意需要使用全路径。**
 
 ### 3. 参数设置
 
@@ -48,7 +46,7 @@ WORKPATH=$(pwd)
 # 是否强制执行
 ISFORCE=0
 # 操作文件
-TARGETFILE=
+TARGETFILE=''
 ```
 
 ### 5. 重写使用说明
