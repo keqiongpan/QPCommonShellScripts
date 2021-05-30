@@ -40,21 +40,23 @@
 ################################################################################
 
 # The path of scripts.
-QPCSS_SCRIPT="$0"
-RUNNING_SCRIPT="$1"
+readonly QPCSS_SCRIPT="$0"
+readonly RUNNING_SCRIPT="$1"
 
 if [ $# -gt 0 ]; then
     shift
 fi
 
 # The position constants of the script.
-WORKDIR=$(pwd)
-BASEDIR=$(cd $(dirname "$RUNNING_SCRIPT"); pwd)
-BASENAME=$(basename "$RUNNING_SCRIPT")
+readonly WORKDIR="$(pwd)"
+readonly BASEDIR="$(cd $(dirname "$RUNNING_SCRIPT"); pwd)"
+readonly BASENAME="$(basename "$RUNNING_SCRIPT")"
 
 # The settings variables of the script.
 DATEFMT='+%Y-%m-%d %H:%M:%S.%3N'
 GETOPTS=''
+
+# The internal variables of the qpcss script.
 VERBOSE=0
 VERBOSE_PREFIX=''
 USAGE=0
@@ -158,6 +160,9 @@ startup() {
             esac
         done
     done
+
+    readonly VERBOSE
+    readonly USAGE
 
     set_verbose_prefix "[STARTUP]"
     verbose "QPCSS_SCRIPT=[$QPCSS_SCRIPT]"
