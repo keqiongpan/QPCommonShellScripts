@@ -70,9 +70,7 @@ USAGE=0
 # To eliminate the behavior differences of `echo' on different platforms.
 # USAGE: display [<string1> [<string2>...]]
 display() {
-cat <<@@display@@
-$@
-@@display@@
+    printf '%s\n' "$@"
 }
 
 # Set the prefix of verbose logs.
