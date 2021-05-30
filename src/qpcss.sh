@@ -75,9 +75,28 @@ fi
 
 # Show the raw content of the input strings.
 # To eliminate the behavior differences of `echo' on different platforms.
-# USAGE: display [<string1> [<string2>...]]
+# USAGE: display [-t <text-color>] [-b <background-color>] [--] [<string1> [<string2>...]]
 display() {
-    printf '%s\n' "$@"
+    local TEXT_COLOR=''
+    local BACKGROUND_COLOR=''
+
+    while getopts ':t:b:-' OPTION; do
+        case "$OPTION" in
+            t) TEXT_COLOR="$OPTARG" ;;
+            b) BACKGROUND_COLOR="$OPTARG" ;;
+            -) break ;;
+        esac
+    done
+    shift $((OPTIND-1))
+
+    set_color $TEXT_COLOR $BACKGROUND_COLOR
+    printf '%s' "$1"
+    if [ $# -gt 1 ]; then
+        shift
+        printf ' %s' "$@"
+    fi
+    reset_color
+    printf '\n'
 }
 
 # Returns the control string for setting text-color and background-color.
@@ -141,7 +160,7 @@ verbose() {
     [ "$VERBOSE" -eq 1 ] || return 0
     local PREFIX="$VERBOSE_PREFIX"
     [ -z "$PREFIX" ] || PREFIX="$PREFIX "
-    display "$@" | sed "s/^/[$(date "$DATEFMT")] [$BASENAME] [$$] $PREFIX/" 1>&2
+    display -- "$@" | sed "s/^/[$(date "$DATEFMT")] [$BASENAME] [$$] $PREFIX/" 1>&2
 }
 
 
@@ -169,7 +188,7 @@ parse() {
 # USAGE: main
 # REMARK: You should override this method.
 main() {
-    display "ERR: You should implement main() method!" 1>&2
+    display -t red "ERR: You should implement main() method!" 1>&2
 }
 
 
@@ -244,7 +263,7 @@ startup() {
 if [ -f "$RUNNING_SCRIPT" ]; then
     . "$RUNNING_SCRIPT"
 else
-    display "ERR: The script \`$RUNNING_SCRIPT' not found." 1>&2
+    display -t red "ERR: The script \`$RUNNING_SCRIPT' not found." 1>&2
     exit 1
 fi
 
