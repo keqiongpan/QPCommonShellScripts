@@ -61,9 +61,16 @@ VERBOSE=0
 VERBOSE_PREFIX=''
 USAGE=0
 
+# The environment constants.
+if [ -t 1 ]; then
+    readonly STDOUT_ON_TERMINAL=1
+else
+    readonly STDOUT_ON_TERMINAL=0
+fi
+
 
 ################################################################################
-#                                     LOG                                      #
+#                                   TERMINAL                                   #
 ################################################################################
 
 # Show the raw content of the input strings.
@@ -72,6 +79,55 @@ USAGE=0
 display() {
     printf '%s\n' "$@"
 }
+
+# Returns the control string for setting text-color and background-color.
+# USAGE: colouring <text-color> <background-color>
+# The color can be black, red, green, yellow, blue, purple, skyblue, white.
+colouring() {
+    local TEXT_COLOR='0'
+    case "$1" in
+        black)   TEXT_COLOR='30' ;;
+        red)     TEXT_COLOR='31' ;;
+        green)   TEXT_COLOR='32' ;;
+        yellow)  TEXT_COLOR='33' ;;
+        blue)    TEXT_COLOR='34' ;;
+        purple)  TEXT_COLOR='35' ;;
+        skyblue) TEXT_COLOR='36' ;;
+        white)   TEXT_COLOR='37' ;;
+    esac
+    local BACKGROUND_COLOR=''
+    case "$2" in
+        black)   BACKGROUND_COLOR='40;' ;;
+        red)     BACKGROUND_COLOR='41;' ;;
+        green)   BACKGROUND_COLOR='42;' ;;
+        yellow)  BACKGROUND_COLOR='43;' ;;
+        blue)    BACKGROUND_COLOR='44;' ;;
+        purple)  BACKGROUND_COLOR='45;' ;;
+        skyblue) BACKGROUND_COLOR='46;' ;;
+        white)   BACKGROUND_COLOR='47;' ;;
+    esac
+    printf "\033[${BACKGROUND_COLOR}${TEXT_COLOR}m"
+}
+
+# Returns the control string for setting text-color and background-color,
+# base on STDOUT is output to terminal, not a pipe or file.
+# USAGE: set_color <text-color> <background-color>
+# The color can be black, red, green, yellow, blue, purple, skyblue, white.
+set_color() {
+    [ $STDOUT_ON_TERMINAL -ne 0 ] && colouring "$@"
+}
+
+# Returns the control string for reset text-color and background-color,
+# base on STDOUT is output to terminal, not a pipe or file.
+# USAGE: reset_color
+reset_color() {
+    [ $STDOUT_ON_TERMINAL -ne 0 ] && printf "\033[0m"
+}
+
+
+################################################################################
+#                                   VERBOSE                                    #
+################################################################################
 
 # Set the prefix of verbose logs.
 # USAGE: set_verbose_prefix <verbose-prefix>
