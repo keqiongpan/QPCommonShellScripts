@@ -79,75 +79,81 @@ fi
 
 # Show the raw content of the input strings.
 # To eliminate the behavior differences of `echo' on different platforms.
-# USAGE: display [-t <text-color>] [-b <background-color>] [--] [<string1> [<string2>...]]
+# USAGE: display [-t <text-attributes>] [--] [<string1> [<string2>...]]
 display() {
-    local TEXT_COLOR=''
-    local BACKGROUND_COLOR=''
+    local TEXT_ATTRIBUTES=''
 
     local OPTION='';
     local OPTARG='';
     local OPTIND=1;
 
-    while getopts ':t:b:-' OPTION; do
+    while getopts ':t:-' OPTION; do
         case "$OPTION" in
-            t) TEXT_COLOR="$OPTARG" ;;
-            b) BACKGROUND_COLOR="$OPTARG" ;;
+            t) TEXT_ATTRIBUTES="$TEXT_ATTRIBUTES $OPTARG" ;;
             -) break ;;
         esac
     done
     shift $((OPTIND-1))
 
-    set_color "$TEXT_COLOR" "$BACKGROUND_COLOR"
+    set_text_attributes $TEXT_ATTRIBUTES
     printf '%s' "$1"
     if [ $# -gt 1 ]; then
         shift
         printf ' %s' "$@"
     fi
-    reset_color
+    reset_text_attributes
     printf '\n'
 }
 
-# Returns the control string for setting text-color and background-color.
-# USAGE: colouring <text-color> <background-color>
-# The color can be black, red, green, yellow, blue, purple, skyblue, white.
-colouring() {
-    local TEXT_COLOR=''
-    case "$1" in
-        black)   TEXT_COLOR='30' ;;
-        red)     TEXT_COLOR='31' ;;
-        green)   TEXT_COLOR='32' ;;
-        yellow)  TEXT_COLOR='33' ;;
-        blue)    TEXT_COLOR='34' ;;
-        purple)  TEXT_COLOR='35' ;;
-        skyblue) TEXT_COLOR='36' ;;
-        white)   TEXT_COLOR='37' ;;
-    esac
-    local BACKGROUND_COLOR=''
-    case "$2" in
-        black)   BACKGROUND_COLOR='40' ;;
-        red)     BACKGROUND_COLOR='41' ;;
-        green)   BACKGROUND_COLOR='42' ;;
-        yellow)  BACKGROUND_COLOR='43' ;;
-        blue)    BACKGROUND_COLOR='44' ;;
-        purple)  BACKGROUND_COLOR='45' ;;
-        skyblue) BACKGROUND_COLOR='46' ;;
-        white)   BACKGROUND_COLOR='47' ;;
-    esac
-    printf "\033[${TEXT_COLOR}${BACKGROUND_COLOR:+${TEXT_COLOR:+;}}${BACKGROUND_COLOR}m"
+# Returns the control string for setting text-attributes.
+# USAGE: text_attributes <attribute>...
+text_attributes() {
+    local TA=''
+    while [ $# -ne 0 ]; do
+        case "$1" in
+            # font-styles
+            normal)     TA="${TA:+$TA;}0"  ; shift ;;
+            bold)       TA="${TA:+$TA;}1"  ; shift ;;
+            italic)     TA="${TA:+$TA;}3"  ; shift ;;
+            underline)  TA="${TA:+$TA;}4"  ; shift ;;
+            # text-effects
+            twinkle)    TA="${TA:+$TA;}5"  ; shift ;;
+            inverse)    TA="${TA:+$TA;}7"  ; shift ;;
+            erase)      TA="${TA:+$TA;}8"  ; shift ;;
+            # foreground-colors
+            black)      TA="${TA:+$TA;}30" ; shift ;;
+            red)        TA="${TA:+$TA;}31" ; shift ;;
+            green)      TA="${TA:+$TA;}32" ; shift ;;
+            yellow)     TA="${TA:+$TA;}33" ; shift ;;
+            blue)       TA="${TA:+$TA;}34" ; shift ;;
+            purple)     TA="${TA:+$TA;}35" ; shift ;;
+            skyblue)    TA="${TA:+$TA;}36" ; shift ;;
+            white)      TA="${TA:+$TA;}37" ; shift ;;
+            # background-colors
+            bg-black)   TA="${TA:+$TA;}40" ; shift ;;
+            bg-red)     TA="${TA:+$TA;}41" ; shift ;;
+            bg-green)   TA="${TA:+$TA;}42" ; shift ;;
+            bg-yellow)  TA="${TA:+$TA;}43" ; shift ;;
+            bg-blue)    TA="${TA:+$TA;}44" ; shift ;;
+            bg-purple)  TA="${TA:+$TA;}45" ; shift ;;
+            bg-skyblue) TA="${TA:+$TA;}46" ; shift ;;
+            bg-white)   TA="${TA:+$TA;}47" ; shift ;;
+        esac
+    done
+    printf "\033[${TA}m"
 }
 
-# Returns the control string for setting text-color and background-color,
+# Returns the control string for setting text-attributes,
 # base on STDOUT is output to terminal, not a pipe or file.
-# USAGE: set_color <text-color> <background-color>
-# The color can be black, red, green, yellow, blue, purple, skyblue, white.
-set_color() {
-    [ $STDOUT_ON_TERMINAL -ne 0 ] && colouring "$@"
+# USAGE: set_text_attributes <attribute>...
+set_text_attributes() {
+    [ $STDOUT_ON_TERMINAL -ne 0 ] && text_attributes "$@"
 }
 
-# Returns the control string for reset text-color and background-color,
+# Returns the control string for reset text-attributes,
 # base on STDOUT is output to terminal, not a pipe or file.
-# USAGE: reset_color
-reset_color() {
+# USAGE: reset_text_attributes
+reset_text_attributes() {
     [ $STDOUT_ON_TERMINAL -ne 0 ] && printf "\033[0m"
 }
 
@@ -159,15 +165,15 @@ reset_color() {
 # Set the tag of verbose logs.
 # USAGE: set_verbose_tag <verbose-tag>
 set_verbose_tag() {
-    __VERBOSE_TAG__="${1:+$(set_color yellow)$1$(reset_color)}"
+    __VERBOSE_TAG__="${1:+$(set_text_attributes yellow bold)$1$(reset_text_attributes)}"
 }
 
 # Returns the stamp of verbose logs.
 # USAGE: verbose_stamp
 verbose_stamp() {
-    set_color skyblue
+    set_text_attributes skyblue bold
     printf '%s' "[$(date "$__VERBOSE_DATE_FORMAT__")] [$BASENAME] [$$]"
-    reset_color
+    reset_text_attributes
 }
 
 # Show verbose logs, if the $VERBOSE enabled.
