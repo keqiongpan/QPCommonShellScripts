@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 
 ################################################################################
@@ -53,13 +53,17 @@ readonly BASEDIR="$(cd $(dirname "$RUNNING_SCRIPT"); pwd)"
 readonly BASENAME="$(basename "$RUNNING_SCRIPT")"
 
 # The settings variables of the script.
-DATEFMT='+%Y-%m-%d %H:%M:%S.%3N'
 GETOPTS=''
+VERBOSE=0
+USAGE=0
 
 # The internal variables of the qpcss script.
-VERBOSE=0
-VERBOSE_PREFIX=''
-USAGE=0
+__VERBOSE_DATE_FORMAT__='+%Y-%m-%d %H:%M:%S'
+__VERBOSE_TAG__=''
+
+if [ $(date '+%3N' 2>/dev/null | grep '^[0-9]\{3\}$' | wc -l) -ne 0 ]; then
+    __VERBOSE_DATE_FORMAT__='+%Y-%m-%d %H:%M:%S.%3N'
+fi
 
 # The environment constants.
 if [ -t 1 ]; then
@@ -80,6 +84,10 @@ display() {
     local TEXT_COLOR=''
     local BACKGROUND_COLOR=''
 
+    local OPTION='';
+    local OPTARG='';
+    local OPTIND=1;
+
     while getopts ':t:b:-' OPTION; do
         case "$OPTION" in
             t) TEXT_COLOR="$OPTARG" ;;
@@ -89,7 +97,7 @@ display() {
     done
     shift $((OPTIND-1))
 
-    set_color $TEXT_COLOR $BACKGROUND_COLOR
+    set_color "$TEXT_COLOR" "$BACKGROUND_COLOR"
     printf '%s' "$1"
     if [ $# -gt 1 ]; then
         shift
@@ -103,7 +111,7 @@ display() {
 # USAGE: colouring <text-color> <background-color>
 # The color can be black, red, green, yellow, blue, purple, skyblue, white.
 colouring() {
-    local TEXT_COLOR='0'
+    local TEXT_COLOR=''
     case "$1" in
         black)   TEXT_COLOR='30' ;;
         red)     TEXT_COLOR='31' ;;
@@ -116,16 +124,16 @@ colouring() {
     esac
     local BACKGROUND_COLOR=''
     case "$2" in
-        black)   BACKGROUND_COLOR='40;' ;;
-        red)     BACKGROUND_COLOR='41;' ;;
-        green)   BACKGROUND_COLOR='42;' ;;
-        yellow)  BACKGROUND_COLOR='43;' ;;
-        blue)    BACKGROUND_COLOR='44;' ;;
-        purple)  BACKGROUND_COLOR='45;' ;;
-        skyblue) BACKGROUND_COLOR='46;' ;;
-        white)   BACKGROUND_COLOR='47;' ;;
+        black)   BACKGROUND_COLOR='40' ;;
+        red)     BACKGROUND_COLOR='41' ;;
+        green)   BACKGROUND_COLOR='42' ;;
+        yellow)  BACKGROUND_COLOR='43' ;;
+        blue)    BACKGROUND_COLOR='44' ;;
+        purple)  BACKGROUND_COLOR='45' ;;
+        skyblue) BACKGROUND_COLOR='46' ;;
+        white)   BACKGROUND_COLOR='47' ;;
     esac
-    printf "\033[${BACKGROUND_COLOR}${TEXT_COLOR}m"
+    printf "\033[${TEXT_COLOR}${BACKGROUND_COLOR:+${TEXT_COLOR:+;}}${BACKGROUND_COLOR}m"
 }
 
 # Returns the control string for setting text-color and background-color,
@@ -148,19 +156,31 @@ reset_color() {
 #                                   VERBOSE                                    #
 ################################################################################
 
-# Set the prefix of verbose logs.
-# USAGE: set_verbose_prefix <verbose-prefix>
-set_verbose_prefix() {
-    VERBOSE_PREFIX="$1"
+# Set the tag of verbose logs.
+# USAGE: set_verbose_tag <verbose-tag>
+set_verbose_tag() {
+    __VERBOSE_TAG__="${1:+$(set_color yellow)$1$(reset_color)}"
+}
+
+# Returns the stamp of verbose logs.
+# USAGE: verbose_stamp
+verbose_stamp() {
+    set_color skyblue
+    printf '%s' "[$(date "$__VERBOSE_DATE_FORMAT__")] [$BASENAME] [$$]"
+    reset_color
 }
 
 # Show verbose logs, if the $VERBOSE enabled.
 # USAGE: verbose <information>...
 verbose() {
     [ "$VERBOSE" -eq 1 ] || return 0
-    local PREFIX="$VERBOSE_PREFIX"
-    [ -z "$PREFIX" ] || PREFIX="$PREFIX "
-    display -- "$@" | sed "s/^/[$(date "$DATEFMT")] [$BASENAME] [$$] $PREFIX/" 1>&2
+    local STAMP="$(verbose_stamp)"
+    STAMP="$STAMP${STAMP:+${__VERBOSE_TAG__:+ }}$__VERBOSE_TAG__"
+    if [ -n "$STAMP" ]; then
+        display -- "$STAMP" "$@" 1>&2
+    else
+        display -- "$@" 1>&2
+    fi
 }
 
 
@@ -212,8 +232,14 @@ prepare() {
 # The entrypoint of the script.
 # USAGE: startup "$@"
 startup() {
-    set_verbose_prefix "[GETOPTS]"
-    verbose "CMDLINE: $QPCSS_SCRIPT $RUNNING_SCRIPT $@"
+    local OPTION='';
+    local OPTARG='';
+    local OPTIND=1;
+
+    set_verbose_tag "[CMDLINE]"
+    verbose "$RUNNING_SCRIPT $@"
+
+    set_verbose_tag "[GETOPTS]"
     while [ $# -ne 0 ]; do
         while getopts ":${GETOPTS}vh" OPTION; do
             verbose "-$OPTION $OPTARG"
@@ -237,21 +263,19 @@ startup() {
     readonly VERBOSE
     readonly USAGE
 
-    set_verbose_prefix "[STARTUP]"
-    verbose "QPCSS_SCRIPT=[$QPCSS_SCRIPT]"
-    verbose "RUNNING_SCRIPT=[$RUNNING_SCRIPT]"
-    verbose "WORKDIR=[$WORKDIR]"
-    verbose "BASEDIR=[$BASEDIR]"
-    verbose "BASENAME=[$BASENAME]"
-    verbose "DATEFMT=[$DATEFMT]"
-    verbose "GETOPTS=[$GETOPTS]"
-    verbose "VERBOSE=[$VERBOSE]"
-    verbose "USAGE=[$USAGE]"
+    set_verbose_tag "[STARTUP]"
+    verbose "QPCSS_SCRIPT => [$QPCSS_SCRIPT]"
+    verbose "RUNNING_SCRIPT => [$RUNNING_SCRIPT]"
+    verbose "WORKDIR => [$WORKDIR]"
+    verbose "BASEDIR => [$BASEDIR]"
+    verbose "BASENAME => [$BASENAME]"
+    verbose "GETOPTS => [$GETOPTS]"
+    verbose "VERBOSE => [$VERBOSE]"
+    verbose "USAGE => [$USAGE]"
 
     [ "$USAGE" -ne 0 ] && { usage; exit 1; }
 
-    set_verbose_prefix "[VERBOSE]"
-    main
+    set_verbose_tag "[VERBOSE]"
 }
 
 
@@ -272,3 +296,6 @@ prepare "$@"
 
 # Call the startup procedure.
 startup "$@"
+
+# Call the main procedure.
+main "$@"

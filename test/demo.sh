@@ -1,9 +1,7 @@
-#!/bin/env qpcss.sh
+#!/usr/bin/env qpcss.sh
 
 # 设置命令行选项，如“-u <用户名> -p <工作路径> -f”可以设置为 u:p:f ，详细说明可查阅 getopts 命令。
 GETOPTS=":u:p:f"
-# 设置日志中日期的格式字符串，一般不需要设置，但部份平台的 date 命令不支持 %3N 展示微秒，需要修改该格式字符串。
-DATEFMT="+%Y-%m-%d %H:%M:%S.%3N"
 
 # 用户名，默认为当前用户。
 USERNAME="$USER"
@@ -37,10 +35,10 @@ parse() {
 
 main() {
     # 打印参数列表，通过命令行选项 -v 可以查该信息。
-    verbose "USERNAME=[$USERNAME]"
-    verbose "WORKPATH=[$WORKPATH]"
-    verbose "ISFORCE=[$ISFORCE]"
-    verbose "TARGETFILE=[$TARGETFILE]"
+    verbose "USERNAME => [$USERNAME]"
+    verbose "WORKPATH => [$WORKPATH]"
+    verbose "ISFORCE => [$ISFORCE]"
+    verbose "TARGETFILE => [$TARGETFILE]"
 
     # 对传入的参数进行校验，如果不合法则提示使用说明并退出脚本执行。
     if [ -z "$USERNAME" -o -z "$WORKPATH" -o -z "$TARGETFILE" ]; then
