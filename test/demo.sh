@@ -47,5 +47,5 @@ main() {
     fi
 
     # 利用传入的参数，实现您自己的脚本逻辑。
-    echo the script logic ...
+    owarn You need to implement your script logic here ...
 }

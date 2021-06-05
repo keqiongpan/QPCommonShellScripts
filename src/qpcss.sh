@@ -186,6 +186,26 @@ verbose() {
 
 
 ################################################################################
+#                                    OUTPUT                                    #
+################################################################################
+
+oinfo() {
+    [ $STDOUT_ON_TERMINAL -eq 0 ] && stamp
+    display -- "$@"
+}
+
+owarn() {
+    [ $STDOUT_ON_TERMINAL -eq 0 ] && stamp 1>&2
+    display -t 'yellow bold italic' -- 'WARN:' "$@" 1>&2
+}
+
+oerr() {
+    [ $STDOUT_ON_TERMINAL -eq 0 ] && stamp 1>&2
+    display -t 'red bold' -- 'ERR:' "$@" 1>&2
+}
+
+
+################################################################################
 #                                  CUSTOMIZE                                   #
 ################################################################################
 
@@ -209,7 +229,7 @@ parse() {
 # USAGE: main
 # REMARK: You should override this method.
 main() {
-    display -t red "ERR: You should implement main() method!" 1>&2
+    oerr 'You should override the main() method!'
 }
 
 
