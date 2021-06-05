@@ -95,13 +95,13 @@ display() {
     done
     shift $((OPTIND-1))
 
-    set_text_attributes $TEXT_ATTRIBUTES
+    tas $TEXT_ATTRIBUTES
     printf '%s' "$1"
     if [ $# -gt 1 ]; then
         shift
         printf ' %s' "$@"
     fi
-    reset_text_attributes
+    sat
     printf '\n'
 }
 
@@ -145,15 +145,15 @@ text_attributes() {
 
 # Returns the control string for setting text-attributes,
 # base on STDOUT is output to terminal, not a pipe or file.
-# USAGE: set_text_attributes <attribute>...
-set_text_attributes() {
+# USAGE: tas <attribute>...
+tas() {
     [ $STDOUT_ON_TERMINAL -ne 0 ] && text_attributes "$@"
 }
 
 # Returns the control string for reset text-attributes,
 # base on STDOUT is output to terminal, not a pipe or file.
-# USAGE: reset_text_attributes
-reset_text_attributes() {
+# USAGE: sat
+sat() {
     [ $STDOUT_ON_TERMINAL -ne 0 ] && printf "\033[0m"
 }
 
@@ -163,24 +163,24 @@ reset_text_attributes() {
 ################################################################################
 
 # Set the tag of verbose logs.
-# USAGE: set_verbose_tag <verbose-tag>
-set_verbose_tag() {
-    __VERBOSE_TAG__="${1:+$(set_text_attributes yellow bold)$1$(reset_text_attributes)}"
+# USAGE: tag <verbose-tag>
+tag() {
+    __VERBOSE_TAG__="${1:+$(tas yellow bold)$1$(sat)}"
 }
 
 # Returns the stamp of verbose logs.
-# USAGE: verbose_stamp
-verbose_stamp() {
-    set_text_attributes skyblue bold
+# USAGE: stamp
+stamp() {
+    tas skyblue bold
     printf '%s' "[$(date "$__VERBOSE_DATE_FORMAT__")] [$BASENAME] [$$]"
-    reset_text_attributes
+    sat
 }
 
 # Show verbose logs, if the $VERBOSE enabled.
 # USAGE: verbose <information>...
 verbose() {
     [ "$VERBOSE" -eq 1 ] || return 0
-    local STAMP="$(verbose_stamp)"
+    local STAMP="$(stamp)"
     STAMP="$STAMP${STAMP:+${__VERBOSE_TAG__:+ }}$__VERBOSE_TAG__"
     if [ -n "$STAMP" ]; then
         display -- "$STAMP" "$@" 1>&2
@@ -242,10 +242,10 @@ startup() {
     local OPTARG='';
     local OPTIND=1;
 
-    set_verbose_tag "[CMDLINE]"
+    tag "[CMDLINE]"
     verbose "$RUNNING_SCRIPT $@"
 
-    set_verbose_tag "[GETOPTS]"
+    tag "[GETOPTS]"
     while [ $# -ne 0 ]; do
         while getopts ":${GETOPTS}vh" OPTION; do
             verbose "-$OPTION $OPTARG"
@@ -269,7 +269,7 @@ startup() {
     readonly VERBOSE
     readonly USAGE
 
-    set_verbose_tag "[STARTUP]"
+    tag "[STARTUP]"
     verbose "QPCSS_SCRIPT => [$QPCSS_SCRIPT]"
     verbose "RUNNING_SCRIPT => [$RUNNING_SCRIPT]"
     verbose "WORKDIR => [$WORKDIR]"
@@ -281,7 +281,7 @@ startup() {
 
     [ "$USAGE" -ne 0 ] && { usage; exit 1; }
 
-    set_verbose_tag "[VERBOSE]"
+    tag "[VERBOSE]"
 }
 
 
