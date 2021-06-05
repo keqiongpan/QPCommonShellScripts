@@ -184,6 +184,13 @@ verbose() {
     display -- "$@" 1>&2
 }
 
+dump() {
+    while [ $# -ne 0 ]; do
+        verbose "$1 => [$(eval "printf '%s' \"\${$1}\"")]"
+        shift
+    done
+}
+
 
 ################################################################################
 #                                    OUTPUT                                    #
@@ -202,6 +209,13 @@ owarn() {
 oerr() {
     [ $STDOUT_ON_TERMINAL -eq 0 ] && stamp 1>&2
     display -t 'red bold' -- 'ERR:' "$@" 1>&2
+}
+
+odump() {
+    while [ $# -ne 0 ]; do
+        oinfo "$1 => [$(eval "printf '%s' \"\${$1}\"")]"
+        shift
+    done
 }
 
 
@@ -285,14 +299,9 @@ startup() {
     readonly USAGE
 
     tag "[STARTUP]"
-    verbose "QPCSS_SCRIPT => [$QPCSS_SCRIPT]"
-    verbose "RUNNING_SCRIPT => [$RUNNING_SCRIPT]"
-    verbose "WORKDIR => [$WORKDIR]"
-    verbose "BASEDIR => [$BASEDIR]"
-    verbose "BASENAME => [$BASENAME]"
-    verbose "GETOPTS => [$GETOPTS]"
-    verbose "VERBOSE => [$VERBOSE]"
-    verbose "USAGE => [$USAGE]"
+    dump QPCSS_SCRIPT RUNNING_SCRIPT STDOUT_ON_TERMINAL
+    dump WORKDIR BASEDIR BASENAME
+    dump GETOPTS VERBOSE USAGE
 
     [ "$USAGE" -ne 0 ] && { usage; exit 1; }
 

@@ -35,10 +35,7 @@ parse() {
 
 main() {
     # 打印参数列表，通过命令行选项 -v 可以查该信息。
-    verbose "USERNAME => [$USERNAME]"
-    verbose "WORKPATH => [$WORKPATH]"
-    verbose "ISFORCE => [$ISFORCE]"
-    verbose "TARGETFILE => [$TARGETFILE]"
+    odump USERNAME WORKPATH ISFORCE TARGETFILE
 
     # 对传入的参数进行校验，如果不合法则提示使用说明并退出脚本执行。
     if [ -z "$USERNAME" -o -z "$WORKPATH" -o -z "$TARGETFILE" ]; then
