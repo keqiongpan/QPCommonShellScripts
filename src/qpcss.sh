@@ -138,6 +138,8 @@ text_attributes() {
             bg-purple)  TA="${TA:+$TA;}45" ; shift ;;
             bg-skyblue) TA="${TA:+$TA;}46" ; shift ;;
             bg-white)   TA="${TA:+$TA;}47" ; shift ;;
+            # raw-codes
+            *)          TA="${TA:+$TA;}$1" ; shift ;;
         esac
     done
     printf "\033[${TA}m"
