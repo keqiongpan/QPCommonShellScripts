@@ -173,22 +173,15 @@ tag() {
 # Returns the stamp of verbose logs.
 # USAGE: stamp
 stamp() {
-    tas skyblue bold
-    printf '%s' "[$(date "$__VERBOSE_DATE_FORMAT__")] [$BASENAME] [$$]"
-    sat
+    printf '%s' "$(tas skyblue bold)[$(date "$__VERBOSE_DATE_FORMAT__")] [$BASENAME] [$$]$(sat)${__VERBOSE_TAG__:+ $__VERBOSE_TAG__} "
 }
 
 # Show verbose logs, if the $VERBOSE enabled.
 # USAGE: verbose <information>...
 verbose() {
     [ "$VERBOSE" -eq 1 ] || return 0
-    local STAMP="$(stamp)"
-    STAMP="$STAMP${STAMP:+${__VERBOSE_TAG__:+ }}$__VERBOSE_TAG__"
-    if [ -n "$STAMP" ]; then
-        display -- "$STAMP" "$@" 1>&2
-    else
-        display -- "$@" 1>&2
-    fi
+    stamp 1>&2
+    display -- "$@" 1>&2
 }
 
 
