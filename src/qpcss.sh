@@ -257,10 +257,16 @@ main() {
 # Preprocessing before starting the script.
 # USAGE: prepare "$@"
 prepare() {
+    local OPTION='';
+    local OPTARG='';
+    local OPTIND=1;
+
     while [ $# -ne 0 ]; do
-        while getopts ":v" OPTION; do
+        while getopts ":vh-:" OPTION; do
             case "$OPTION" in
                 v) VERBOSE=1 ;;
+                h) USAGE=1 ;;
+                -) [ "${#OPTARG}" -ne 0 -a -z "${OPTARG#help}" ] && USAGE=1 ;;
             esac
         done
         shift
