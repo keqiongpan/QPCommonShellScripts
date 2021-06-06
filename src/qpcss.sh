@@ -40,8 +40,10 @@
 ################################################################################
 
 # The path of scripts.
-readonly QPCSS_SCRIPT="$0"
-readonly RUNNING_SCRIPT="$1"
+readonly QPCSS_PATH="$0"
+readonly QPCSS_VERSION='0.1.0'
+readonly SCRIPT_PATH="$1"
+SCRIPT_VERSION='0.0.0'
 
 if [ $# -gt 0 ]; then
     shift
@@ -49,8 +51,8 @@ fi
 
 # The position constants of the script.
 readonly WORKDIR="$(pwd)"
-readonly BASEDIR="$(cd $(dirname "$RUNNING_SCRIPT"); pwd)"
-readonly BASENAME="$(basename "$RUNNING_SCRIPT")"
+readonly BASEDIR="$(cd $(dirname "$SCRIPT_PATH"); pwd)"
+readonly BASENAME="$(basename "$SCRIPT_PATH")"
 
 # The settings variables of the script.
 GETOPTS=''
@@ -272,7 +274,7 @@ startup() {
     local OPTIND=1;
 
     tag "[CMDLINE]"
-    verbose "$RUNNING_SCRIPT $@"
+    verbose "$SCRIPT_PATH $@"
 
     tag "[GETOPTS]"
     while [ $# -ne 0 ]; do
@@ -299,8 +301,8 @@ startup() {
     readonly USAGE
 
     tag "[STARTUP]"
-    dump QPCSS_SCRIPT RUNNING_SCRIPT STDOUT_ON_TERMINAL
-    dump WORKDIR BASEDIR BASENAME
+    dump QPCSS_PATH QPCSS_VERSION SCRIPT_PATH SCRIPT_VERSION
+    dump WORKDIR BASEDIR BASENAME STDOUT_ON_TERMINAL
     dump GETOPTS VERBOSE USAGE
 
     [ "$USAGE" -ne 0 ] && { usage; exit 1; }
@@ -314,10 +316,10 @@ startup() {
 ################################################################################
 
 # Invoke the running-script.
-if [ -f "$RUNNING_SCRIPT" ]; then
-    . "$RUNNING_SCRIPT"
+if [ -f "$SCRIPT_PATH" ]; then
+    . "$SCRIPT_PATH"
 else
-    display -t red "ERR: The script \`$RUNNING_SCRIPT' not found." 1>&2
+    display -t red "ERR: The script \`$SCRIPT_PATH' not found." 1>&2
     exit 1
 fi
 
