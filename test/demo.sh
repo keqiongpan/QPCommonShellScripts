@@ -1,7 +1,7 @@
 #!/usr/bin/env qpcss.sh
 
 # 设置命令行选项，如“-u <用户名> -p <工作路径> -f”可以设置为 u:p:f ，详细说明可查阅 getopts 命令。
-GETOPTS=":u:p:f"
+GETOPTS="u:p:f"
 
 # 用户名，默认为当前用户。
 USERNAME="$USER"
@@ -29,7 +29,7 @@ parse() {
         f) ISFORCE=1 ;;
         u) USERNAME="$2" ;;
         p) WORKPATH="$2" ;;
-        :) TARGETFILE="$2" ;;
+        *) TARGETFILE="$2" ;;
     esac
 }
 
