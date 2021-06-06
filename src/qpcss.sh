@@ -333,9 +333,10 @@ startup() {
 
 # Invoke the running-script.
 if [ -f "$SCRIPT_PATH" ]; then
+    tag "[LOADING]"
     . "$SCRIPT_PATH"
 else
-    display -t red "ERR: The script \`$SCRIPT_PATH' not found." 1>&2
+    oerr "The script \`$SCRIPT_PATH' not found."
     exit 1
 fi
 
