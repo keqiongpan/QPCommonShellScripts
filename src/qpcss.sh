@@ -56,6 +56,7 @@ readonly BASENAME="$(basename "$SCRIPT_PATH")"
 
 # The settings variables of the script.
 GETOPTS=''
+OTHOPTS=''
 VERBOSE=0
 USAGE=0
 
@@ -286,6 +287,10 @@ startup() {
                 *)  parse "$OPTION" "$OPTARG" ;;
             esac
         done
+        if [ "$OPTIND" -gt 1 ]; then
+            OPTION="$(eval "printf '%s' \"\${$((OPTIND-1))}\"")"
+            [ "${#OPTION}" -ne 0 -a -z "${OPTION#--}" ] && { shift $((OPTIND-1)); break; }
+        fi
         shift $((OPTIND-1))
         while [ $# -ne 0 ]; do
             case "$1" in
@@ -297,17 +302,22 @@ startup() {
         done
     done
 
+    OTHOPTS="$@"
+
+    readonly GETOPTS
+    readonly OTHOPTS
     readonly VERBOSE
     readonly USAGE
 
     tag "[STARTUP]"
     dump QPCSS_PATH QPCSS_VERSION SCRIPT_PATH SCRIPT_VERSION
     dump WORKDIR BASEDIR BASENAME STDOUT_ON_TERMINAL
-    dump GETOPTS VERBOSE USAGE
+    dump GETOPTS OTHOPTS VERBOSE USAGE
 
     [ "$USAGE" -ne 0 ] && { usage; exit 1; }
 
     tag "[VERBOSE]"
+    main "$@"
 }
 
 
@@ -328,6 +338,3 @@ prepare "$@"
 
 # Call the startup procedure.
 startup "$@"
-
-# Call the main procedure.
-main "$@"
